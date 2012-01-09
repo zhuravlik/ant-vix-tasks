@@ -1,0 +1,20 @@
+== What is it
+Set of tasks to use with Apache Ant to control VMWare VMs via VIX API.
+
+== License
+Library is licensed under GNU LGPLv3. You are free to use it under the terms of this license.
+If you are sure that you need a special exception and you are able to explain why you think so, please contact me (see later).
+
+== Contributions
+I will be pleased to accept any contibutions to this project.
+
+What things would be nice to be done:
+- new tasks; but please, use RAW api, not any object-oriented wrappers;
+- VM APIs distinct from VIX API: I don't know whether I'll have time to meet VirtualBox COM API, or others; would be great if anyone can help
+- documentation :) although I hope that I'll have time to write it myself
+
+== The author
+My name is Anton, and I am currently software tests developer. The idea behind this project has roots in our internal software currently developed by me.
+But this project is a clean room rework of it, without our proprietary part, and without some initial design flaws, also. :)
+
+If you wish to contact me, feel free to write to my mailbox:  ahmad200512<[at]>yandex.ru.
