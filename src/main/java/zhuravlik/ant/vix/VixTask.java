@@ -130,6 +130,54 @@ public class VixTask extends Task {
 
     private String vixPath;
 
+    public void addCaptureScreen(CaptureScreen captureScreen) {
+        actions.add(captureScreen);
+    }
+
+    public void addDeleteDirectory(DeleteDirectory deleteDirectory) {
+        actions.add(deleteDirectory);
+    }
+
+    public void addDeleteFile(DeleteFile deleteFile) {
+        actions.add(deleteFile);
+    }
+
+    public void addInstallTools(InstallTools installTools) {
+        actions.add(installTools);
+    }
+
+    public void addKillProcess(KillProcess killProcess) {
+        actions.add(killProcess);
+    }
+
+    public void addLogout(Logout logout) {
+        actions.add(logout);
+    }
+
+    public void addMoveFile(MoveFile moveFile) {
+        actions.add(moveFile);
+    }
+
+    public void addRunScript(RunScript runScript) {
+        actions.add(runScript);
+    }
+
+    public void addToggleSharedFolders(ToggleSharedFolders toggleSharedFolders) {
+        actions.add(toggleSharedFolders);
+    }
+
+    public void addWaitForPowerState(WaitForPowerState waitForPowerState) {
+        actions.add(waitForPowerState);
+    }
+
+    public void addWaitForProcess(WaitForProcess waitForProcess) {
+        actions.add(waitForProcess);
+    }
+
+    public void addWaitForTools(WaitForTools waitForTools) {
+        actions.add(waitForTools);
+    }
+
     public void addPowerOn(PowerOn powerOn) {
         actions.add(powerOn);
     }
