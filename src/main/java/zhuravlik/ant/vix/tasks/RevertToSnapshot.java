@@ -72,22 +72,17 @@ public class RevertToSnapshot extends VixAction {
 
         log("Reverting to snapshot [" + name + "]", Project.MSG_INFO);
 
-        log("VM Handle: " + vmHandle);
+        //log("VM Handle: " + vmHandle);
 
         int jobHandle = Vix.VIX_INVALID_HANDLE;
         IntByReference snapshotHandlePtr = new IntByReference();
 
-        jobHandle = LibraryHelper.getInstance().VixVM_GetNamedSnapshot(vmHandle,
+        int err = LibraryHelper.getInstance().VixVM_GetNamedSnapshot(vmHandle,
             name,
             snapshotHandlePtr);
-
-        log("Job Handle: " + jobHandle);
-
-        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
-        LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
 
-        log("Snapshot handle: " + snapshotHandlePtr.getValue(), Project.MSG_INFO);
+        //log("Snapshot handle: " + snapshotHandlePtr.getValue(), Project.MSG_INFO);
         
         int options = 0;
         
