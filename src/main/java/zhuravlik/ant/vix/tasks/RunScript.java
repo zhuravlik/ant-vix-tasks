@@ -28,6 +28,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import zhuravlik.ant.vix.LibraryHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -106,11 +107,11 @@ public class RunScript extends VixAction {
 
         if (returnImmediately) options |= Vix.VIX_RUNPROGRAM_RETURN_IMMEDIATELY;
 
-        jobHandle = Vix.INSTANCE.VixVM_RunScriptInGuest(vmHandle, interpreter, text,
+        jobHandle = LibraryHelper.getInstance().VixVM_RunScriptInGuest(vmHandle, interpreter, text,
                 options, Vix.VIX_INVALID_HANDLE, null, null);
 
-        int err = Vix.INSTANCE.VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
-        Vix.INSTANCE.Vix_ReleaseHandle(jobHandle);
+        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
+        LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
     }
 }

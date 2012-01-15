@@ -33,7 +33,7 @@ import com.sun.jna.ptr.IntByReference;
  */
 public interface Vix extends Library{
 
-    Vix INSTANCE = (Vix) Native.loadLibrary("vix", Vix.class);//Vix.getInterfaceInstance();
+    //Vix INSTANCE = LibraryHelper.loadVixLibrary();//Vix.getInterfaceInstance();
 
     public static final int VIX_INVALID_HANDLE = 0;
 

@@ -22,6 +22,7 @@ package zhuravlik.ant.vix.tasks;
 import org.apache.tools.ant.Project;
 import zhuravlik.ant.vix.Vix;
 import zhuravlik.ant.vix.VixAction;
+import zhuravlik.ant.vix.LibraryHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -57,7 +58,7 @@ public class InstallTools extends VixAction {
 
         int jobHandle = Vix.VIX_INVALID_HANDLE;
 
-        jobHandle = Vix.INSTANCE.VixVM_InstallTools(
+        jobHandle = LibraryHelper.getInstance().VixVM_InstallTools(
                 vmHandle,
                 (mount ? Vix.VIX_INSTALLTOOLS_MOUNT_TOOLS_INSTALLER : Vix.VIX_INSTALLTOOLS_AUTO_UPGRADE) |
                         (returnImmediately ? Vix.VIX_INSTALLTOOLS_RETURN_IMMEDIATELY : 0),
@@ -67,8 +68,8 @@ public class InstallTools extends VixAction {
         );
 
 
-        int err = Vix.INSTANCE.VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
-        Vix.INSTANCE.Vix_ReleaseHandle(jobHandle);
+        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
+        LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
     }
 }

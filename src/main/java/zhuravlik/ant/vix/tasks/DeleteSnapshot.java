@@ -25,6 +25,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import zhuravlik.ant.vix.Vix;
 import zhuravlik.ant.vix.VixAction;
+import zhuravlik.ant.vix.LibraryHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -66,25 +67,25 @@ public class DeleteSnapshot extends VixAction {
         int jobHandle = Vix.VIX_INVALID_HANDLE;
         IntByReference snapshotHandlePtr = new IntByReference();
 
-        jobHandle = Vix.INSTANCE.VixVM_GetNamedSnapshot(vmHandle,
+        jobHandle = LibraryHelper.getInstance().VixVM_GetNamedSnapshot(vmHandle,
                 name,
                 snapshotHandlePtr);
 
-        int err = Vix.INSTANCE.VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
-        Vix.INSTANCE.Vix_ReleaseHandle(jobHandle);
+        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
+        LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
 
 
-        jobHandle = Vix.INSTANCE.VixVM_RemoveSnapshot(vmHandle,
+        jobHandle = LibraryHelper.getInstance().VixVM_RemoveSnapshot(vmHandle,
                 snapshotHandlePtr.getValue(),
                 withChilden ? Vix.VIX_SNAPSHOT_REMOVE_CHILDREN : 0,
                 null,
                 null);
 
-        Vix.INSTANCE.Vix_ReleaseHandle(snapshotHandlePtr.getValue());
+        LibraryHelper.getInstance().Vix_ReleaseHandle(snapshotHandlePtr.getValue());
 
-        err = Vix.INSTANCE.VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
-        Vix.INSTANCE.Vix_ReleaseHandle(jobHandle);
+        err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
+        LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
     }
 }

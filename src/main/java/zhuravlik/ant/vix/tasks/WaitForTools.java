@@ -22,6 +22,7 @@ package zhuravlik.ant.vix.tasks;
 import org.apache.tools.ant.Project;
 import zhuravlik.ant.vix.Vix;
 import zhuravlik.ant.vix.VixAction;
+import zhuravlik.ant.vix.LibraryHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,10 +49,10 @@ public class WaitForTools extends VixAction {
 
         int jobHandle = Vix.VIX_INVALID_HANDLE;
 
-        jobHandle = Vix.INSTANCE.VixVM_WaitForToolsInGuest(vmHandle, timeout, null, null);
+        jobHandle = LibraryHelper.getInstance().VixVM_WaitForToolsInGuest(vmHandle, timeout, null, null);
 
-        int err = Vix.INSTANCE.VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
-        Vix.INSTANCE.Vix_ReleaseHandle(jobHandle);
+        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
+        LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
     }
 }

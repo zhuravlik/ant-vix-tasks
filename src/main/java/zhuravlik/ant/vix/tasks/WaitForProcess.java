@@ -25,6 +25,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import zhuravlik.ant.vix.Vix;
 import zhuravlik.ant.vix.VixAction;
+import zhuravlik.ant.vix.LibraryHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -103,12 +104,12 @@ public class WaitForProcess extends VixAction {
 
             int jobHandle = Vix.VIX_INVALID_HANDLE;
 
-            jobHandle = Vix.INSTANCE.VixVM_ListProcessesInGuest(vmHandle, 0, null, null);
+            jobHandle = LibraryHelper.getInstance().VixVM_ListProcessesInGuest(vmHandle, 0, null, null);
 
-            int err = Vix.INSTANCE.VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
+            int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
             checkError(err);
 
-            int num = Vix.INSTANCE.VixJob_GetNumProperties(jobHandle, Vix.VIX_PROPERTY_JOB_RESULT_ITEM_NAME);
+            int num = LibraryHelper.getInstance().VixJob_GetNumProperties(jobHandle, Vix.VIX_PROPERTY_JOB_RESULT_ITEM_NAME);
 
             boolean found = false;
 
@@ -116,17 +117,17 @@ public class WaitForProcess extends VixAction {
                 PointerByReference processName = new PointerByReference();
                 PointerByReference cmdLinePtr = new PointerByReference();
 
-                err = Vix.INSTANCE.VixJob_GetNthProperties(jobHandle, j,
+                err = LibraryHelper.getInstance().VixJob_GetNthProperties(jobHandle, j,
                         Vix.VIX_PROPERTY_JOB_RESULT_ITEM_NAME, processName,
                         Vix.VIX_PROPERTY_JOB_RESULT_PROCESS_COMMAND, cmdLinePtr,
                         Vix.VIX_PROPERTY_NONE);
                 checkError(err);
 
                 String pname = processName.getValue().getString(0);
-                Vix.INSTANCE.Vix_FreeBuffer(processName.getValue());
+                LibraryHelper.getInstance().Vix_FreeBuffer(processName.getValue());
                 
                 String cmd = cmdLinePtr.getValue().getString(0);
-                Vix.INSTANCE.Vix_FreeBuffer(cmdLinePtr.getValue());
+                LibraryHelper.getInstance().Vix_FreeBuffer(cmdLinePtr.getValue());
 
                 if (name != null ?
                                 (strict && name.equals(pname) || name.contains(pname)) :
@@ -137,7 +138,7 @@ public class WaitForProcess extends VixAction {
             }
 
 
-            Vix.INSTANCE.Vix_ReleaseHandle(jobHandle);
+            LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
 
             if ((appear && found) || (!appear && !found)) {
                 return;

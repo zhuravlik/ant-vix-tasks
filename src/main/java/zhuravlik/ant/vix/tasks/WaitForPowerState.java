@@ -25,6 +25,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import zhuravlik.ant.vix.Vix;
 import zhuravlik.ant.vix.VixAction;
+import zhuravlik.ant.vix.LibraryHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -90,7 +91,7 @@ public class WaitForPowerState extends VixAction {
         
         for (int i = 0; timeout <= 0 || i < timeout; i++) {
             IntByReference statePtr = new IntByReference();
-            int err = Vix.INSTANCE.Vix_GetProperties(vmHandle, Vix.VIX_PROPERTY_VM_POWER_STATE,
+            int err = LibraryHelper.getInstance().Vix_GetProperties(vmHandle, Vix.VIX_PROPERTY_VM_POWER_STATE,
                     statePtr, Vix.VIX_PROPERTY_NONE);
             checkError(err);
             

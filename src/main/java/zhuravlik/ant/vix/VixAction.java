@@ -46,9 +46,9 @@ public abstract class VixAction extends ProjectComponent {
         if (Vix.VIX_OK != err) {
 
             if (!ignoreError)
-                throw new BuildException("VMWare error: " + Vix.INSTANCE.Vix_GetErrorText(err, null));
+                throw new BuildException("VMWare error: " + LibraryHelper.getInstance().Vix_GetErrorText(err, null));
             else
-                log("VMWare error: " + Vix.INSTANCE.Vix_GetErrorText(err, null), Project.MSG_ERR);
+                log("VMWare error: " + LibraryHelper.getInstance().Vix_GetErrorText(err, null), Project.MSG_ERR);
         }
     }
 

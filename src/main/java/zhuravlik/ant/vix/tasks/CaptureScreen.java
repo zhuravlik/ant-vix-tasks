@@ -26,6 +26,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import zhuravlik.ant.vix.Vix;
 import zhuravlik.ant.vix.VixAction;
+import zhuravlik.ant.vix.LibraryHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,22 +56,22 @@ public class CaptureScreen extends VixAction {
         log("Capturing VM screen image", Project.MSG_INFO);
 
         int jobHandle = Vix.VIX_INVALID_HANDLE;
-        jobHandle = Vix.INSTANCE.VixVM_CaptureScreenImage(vmHandle, Vix.VIX_CAPTURESCREENFORMAT_PNG,
+        jobHandle = LibraryHelper.getInstance().VixVM_CaptureScreenImage(vmHandle, Vix.VIX_CAPTURESCREENFORMAT_PNG,
                 Vix.VIX_INVALID_HANDLE, null, null);
 
         IntByReference byteCount = new IntByReference();
         PointerByReference data = new PointerByReference();
 
-        int err = Vix.INSTANCE.VixJob_Wait(jobHandle,
+        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle,
                 Vix.VIX_PROPERTY_JOB_RESULT_SCREEN_IMAGE_DATA,
                 byteCount, data,
                 Vix.VIX_PROPERTY_NONE);
-        Vix.INSTANCE.Vix_ReleaseHandle(jobHandle);
+        LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
 
         Pointer p = data.getValue();
         byte[] bdata = p.getByteArray(0, byteCount.getValue());
-        Vix.INSTANCE.Vix_FreeBuffer(p);
+        LibraryHelper.getInstance().Vix_FreeBuffer(p);
         
         try {
             new File(path).createNewFile();

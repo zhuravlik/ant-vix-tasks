@@ -55,9 +55,9 @@ public class VixTask extends Task {
         if (Vix.VIX_OK != err) {
 
             if (!ignoreError)
-                throw new BuildException("VMWare error: " + Vix.INSTANCE.Vix_GetErrorText(err, null));
+                throw new BuildException("VMWare error: " + LibraryHelper.getInstance().Vix_GetErrorText(err, null));
             else
-                log("VMWare error: " + Vix.INSTANCE.Vix_GetErrorText(err, null), Project.MSG_ERR);
+                log("VMWare error: " + LibraryHelper.getInstance().Vix_GetErrorText(err, null), Project.MSG_ERR);
         }
     }
 
@@ -221,33 +221,7 @@ public class VixTask extends Task {
     public void execute() throws BuildException {
 
         if (vixPath != null && vixPath.length() > 0) {
-            System.setProperty("jna.library.path", vixPath);
-            log("JNA library path is set to: " + vixPath, Project.MSG_INFO);
-        }
-        else if (SystemUtils.IS_OS_WINDOWS)
-        {
-            File dir = new File("C:/Program Files/VMware/VMware VIX/");
-            String[] list = dir.list();
-            for (String fl: list)
-            {
-                if (fl.contains("Workstation-") || fl.contains("Server-") || fl.contains("Player-"))
-                {
-                    //logger.info("Detected " + fl);
-                    File wdir = new File("C:/Program Files/VMware/VMware VIX/" + fl);
-                    String[] wlist = wdir.list();
-                    for (String pfl: wlist)
-                    {
-                        if (pfl.equals("64bit") || pfl.equals("32bit")) {
-                            System.setProperty("jna.library.path", "C:/Program Files/VMware/VMware VIX/" + fl + "/" + pfl);
-                            log("JNA library path is set to: " + "C:/Program Files/VMware/VMware VIX/" + fl + "/" + pfl, Project.MSG_INFO);
-                        }
-                    }
-                }
-            }
-        }
-        else {
-            System.setProperty("jna.library.path", "/usr/lib/vmware-vix/");
-            log("JNA library path is set to: /usr/lib/vmware-vix/", Project.MSG_INFO);
+            LibraryHelper.path = vixPath;
         }
 
         int provider;
@@ -292,34 +266,37 @@ public class VixTask extends Task {
 
         log("Connecting", Project.MSG_INFO);
                 
-        jobHandle = Vix.INSTANCE.VixHost_Connect(Vix.VIX_API_VERSION, provider,
+        jobHandle = LibraryHelper.getInstance().VixHost_Connect(Vix.VIX_API_VERSION, provider,
                 host, port, user, password, 0, Vix.VIX_INVALID_HANDLE, null, null);
 
-        int err = Vix.INSTANCE.VixJob_Wait(jobHandle,
+        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle,
                 Vix.VIX_PROPERTY_JOB_RESULT_HANDLE,
                 hostHandlePtr,
                 Vix.VIX_PROPERTY_NONE);
 
-        Vix.INSTANCE.Vix_ReleaseHandle(jobHandle);
+        LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
 
+        log("Opening VM [" + path + "]");
 
-        jobHandle = Vix.INSTANCE.VixHost_OpenVM(hostHandlePtr.getValue(), path,
+
+        jobHandle = LibraryHelper.getInstance().VixHost_OpenVM(hostHandlePtr.getValue(), path,
                 Vix.VIX_VMOPEN_NORMAL, Vix.VIX_INVALID_HANDLE, null, null);
         
         IntByReference vmHandlePtr = new IntByReference();
         
-        err = Vix.INSTANCE.VixJob_Wait(jobHandle,
+        err = LibraryHelper.getInstance().VixJob_Wait(jobHandle,
                 Vix.VIX_PROPERTY_JOB_RESULT_HANDLE,
                 vmHandlePtr,
                 Vix.VIX_PROPERTY_NONE);
 
+        checkError(err);
 
         for (VixAction vixAction: actions) {
             vixAction.executeAction(vmHandlePtr.getValue());
         }
         
-        Vix.INSTANCE.VixHost_Disconnect(hostHandlePtr.getValue());
-        Vix.INSTANCE.Vix_ReleaseHandle(hostHandlePtr.getValue());
+        LibraryHelper.getInstance().VixHost_Disconnect(hostHandlePtr.getValue());
+        LibraryHelper.getInstance().Vix_ReleaseHandle(hostHandlePtr.getValue());
     }
 }

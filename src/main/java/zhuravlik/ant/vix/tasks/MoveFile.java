@@ -23,6 +23,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import zhuravlik.ant.vix.Vix;
 import zhuravlik.ant.vix.VixAction;
+import zhuravlik.ant.vix.LibraryHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -65,11 +66,11 @@ public class MoveFile extends VixAction {
 
         int jobHandle = Vix.VIX_INVALID_HANDLE;
 
-        jobHandle = Vix.INSTANCE.VixVM_RenameFileInGuest(vmHandle, path, destination,
+        jobHandle = LibraryHelper.getInstance().VixVM_RenameFileInGuest(vmHandle, path, destination,
                 0, Vix.VIX_INVALID_HANDLE, null, null);
 
-        int err = Vix.INSTANCE.VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
-        Vix.INSTANCE.Vix_ReleaseHandle(jobHandle);
+        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
+        LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
     }
 }

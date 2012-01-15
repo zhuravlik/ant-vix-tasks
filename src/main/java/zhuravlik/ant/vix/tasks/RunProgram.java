@@ -23,6 +23,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import zhuravlik.ant.vix.Vix;
 import zhuravlik.ant.vix.VixAction;
+import zhuravlik.ant.vix.LibraryHelper;
 
 /**
  * Created by IntelliJ IDEA.
@@ -90,11 +91,11 @@ public class RunProgram extends VixAction {
         if (returnImmediately) options |= Vix.VIX_RUNPROGRAM_RETURN_IMMEDIATELY;
         if (activateWindow) options |= Vix.VIX_RUNPROGRAM_ACTIVATE_WINDOW;
 
-        jobHandle = Vix.INSTANCE.VixVM_RunProgramInGuest(vmHandle, path, args,
+        jobHandle = LibraryHelper.getInstance().VixVM_RunProgramInGuest(vmHandle, path, args,
                 options, Vix.VIX_INVALID_HANDLE, null, null);
 
-        int err = Vix.INSTANCE.VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
-        Vix.INSTANCE.Vix_ReleaseHandle(jobHandle);
+        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
+        LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
     }
 }
