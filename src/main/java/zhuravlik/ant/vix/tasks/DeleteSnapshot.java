@@ -38,7 +38,7 @@ public class DeleteSnapshot extends VixAction {
 
     String name = null;
 
-    boolean withChilden = false;
+    boolean withChildren = false;
 
     public String getName() {
         return name;
@@ -48,12 +48,12 @@ public class DeleteSnapshot extends VixAction {
         this.name = name;
     }
 
-    public boolean isWithChilden() {
-        return withChilden;
+    public boolean isWithChildren() {
+        return withChildren;
     }
 
-    public void setWithChilden(boolean withChilden) {
-        this.withChilden = withChilden;
+    public void setWithChildren(boolean withChildren) {
+        this.withChildren = withChildren;
     }
 
     @Override
@@ -78,7 +78,7 @@ public class DeleteSnapshot extends VixAction {
 
         jobHandle = LibraryHelper.getInstance().VixVM_RemoveSnapshot(vmHandle,
                 snapshotHandlePtr.getValue(),
-                withChilden ? Vix.VIX_SNAPSHOT_REMOVE_CHILDREN : 0,
+                withChildren ? Vix.VIX_SNAPSHOT_REMOVE_CHILDREN : 0,
                 null,
                 null);
 
