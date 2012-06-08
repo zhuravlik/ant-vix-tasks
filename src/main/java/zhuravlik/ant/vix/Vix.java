@@ -952,4 +952,11 @@ public interface Vix extends Library{
                                    IntByReference parentSnapshotHandle);
 
     String Vix_GetErrorText(int err, String locale);
+    
+    
+    
+    int VixVM_Delete(int vmHandle,
+                                           int options,
+                                           VixEventProcCallback callbackProc,
+                                           Pointer clientData);
 }

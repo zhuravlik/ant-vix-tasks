@@ -217,6 +217,38 @@ public class VixTask extends Task {
     public void addRunProgram(RunProgram vixAction) {
         actions.add(vixAction);
     }
+    
+    public void addAddSharedFolder(AddSharedFolder vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addClone(Clone vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addDelete(Delete vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addPause(Pause vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addRemoveSharedFolder(RemoveSharedFolder vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addReset(Reset vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addSuspend(Suspend vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addUnpause(Unpause vixAction) {
+        actions.add(vixAction);
+    }
 
     public void execute() throws BuildException {
 
