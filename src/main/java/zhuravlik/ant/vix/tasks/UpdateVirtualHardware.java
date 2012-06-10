@@ -16,9 +16,10 @@
    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301 USA
  */
+
 package zhuravlik.ant.vix.tasks;
 
-import com.sun.jna.ptr.PointerByReference;
+import com.sun.jna.Pointer;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import zhuravlik.ant.vix.LibraryHelper;
@@ -29,38 +30,19 @@ import zhuravlik.ant.vix.VixAction;
  *
  * @author anton
  */
-public class CreateTempFile extends VixAction {
-
-    String propName = "vix.tempfile.path";
-
-    public String getPropName() {
-        return propName;
-    }
-
-    public void setPropName(String propName) {
-        this.propName = propName;
-    }        
+public class UpdateVirtualHardware extends VixAction {
     
     @Override
-    public void executeAction(int vmHandle) {
-        log("Creating temporary file in guest, result is stored in system property " + propName, Project.MSG_INFO);
+    public void executeAction(int vmHandle) {        
+        
+        log("Upgrading VM's virtual hardware", Project.MSG_INFO);
 
         int jobHandle = Vix.VIX_INVALID_HANDLE;
 
-        jobHandle = LibraryHelper.getInstance().VixVM_CreateTempFileInGuest(vmHandle,
-            0,
-            Vix.VIX_INVALID_HANDLE,
-            null,
-            null);
+        jobHandle = LibraryHelper.getInstance().VixVM_UpgradeVirtualHardware(vmHandle, 0, null, null);
 
-        PointerByReference tempFilePathRef = new PointerByReference();
-        
-        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_JOB_RESULT_ITEM_NAME , tempFilePathRef, Vix.VIX_PROPERTY_NONE);
+        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
         LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
-        
-        System.setProperty(propName, tempFilePathRef.getValue().getString(0));
-        
-        LibraryHelper.getInstance().Vix_FreeBuffer(tempFilePathRef.getValue());
     }    
 }

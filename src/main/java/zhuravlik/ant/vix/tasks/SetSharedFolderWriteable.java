@@ -16,9 +16,10 @@
    Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
    Boston, MA 02110-1301 USA
  */
+
 package zhuravlik.ant.vix.tasks;
 
-import com.sun.jna.ptr.PointerByReference;
+import com.sun.jna.Pointer;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import zhuravlik.ant.vix.LibraryHelper;
@@ -29,38 +30,51 @@ import zhuravlik.ant.vix.VixAction;
  *
  * @author anton
  */
-public class CreateTempFile extends VixAction {
+public class SetSharedFolderWriteable extends VixAction {
+    
+    boolean writeable = true;
+    String shareName;
+    String hostPath;
 
-    String propName = "vix.tempfile.path";
-
-    public String getPropName() {
-        return propName;
+    public boolean isWriteable() {
+        return writeable;
     }
 
-    public void setPropName(String propName) {
-        this.propName = propName;
+    public void setWriteable(boolean writeable) {
+        this.writeable = writeable;
+    }
+
+    public String getHostPath() {
+        return hostPath;
+    }
+
+    public void setHostPath(String hostPath) {
+        this.hostPath = hostPath;
+    }
+
+    public String getShareName() {
+        return shareName;
+    }
+
+    public void setShareName(String shareName) {
+        this.shareName = shareName;
     }        
     
     @Override
     public void executeAction(int vmHandle) {
-        log("Creating temporary file in guest, result is stored in system property " + propName, Project.MSG_INFO);
-
+        
+        if (shareName == null || hostPath == null || shareName.length() == 0 || hostPath.length() == 0)
+            throw new BuildException("Either share name or host path is not specified");
+        
+        log("Setting shared folder (" + shareName +", " + hostPath + ")  " + (writeable ? "writeable" : "non-writeable"),
+                Project.MSG_INFO);
+        
         int jobHandle = Vix.VIX_INVALID_HANDLE;
 
-        jobHandle = LibraryHelper.getInstance().VixVM_CreateTempFileInGuest(vmHandle,
-            0,
-            Vix.VIX_INVALID_HANDLE,
-            null,
-            null);
+        jobHandle = LibraryHelper.getInstance().VixVM_SetSharedFolderState(vmHandle, shareName, hostPath, writeable ? Vix.VIX_SHAREDFOLDER_WRITE_ACCESS : 0, null, null);
 
-        PointerByReference tempFilePathRef = new PointerByReference();
-        
-        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_JOB_RESULT_ITEM_NAME , tempFilePathRef, Vix.VIX_PROPERTY_NONE);
+        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
         LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
-        
-        System.setProperty(propName, tempFilePathRef.getValue().getString(0));
-        
-        LibraryHelper.getInstance().Vix_FreeBuffer(tempFilePathRef.getValue());
-    }    
+    }
 }

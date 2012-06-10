@@ -249,6 +249,34 @@ public class VixTask extends Task {
     public void addUnpause(Unpause vixAction) {
         actions.add(vixAction);
     }
+    
+    public void addReadVariable(ReadVariable vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addSetSharedFolderWriteable(SetSharedFolderWriteable vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addUpdateVirtualHardware(UpdateVirtualHardware vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addWaitForDirectory(WaitForDirectory vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addWaitForFile(WaitForFile vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addWaitForVariableValue(WaitForVariableValue vixAction) {
+        actions.add(vixAction);
+    }
+    
+    public void addWriteVariable(WriteVariable vixAction) {
+        actions.add(vixAction);
+    }
 
     public void execute() throws BuildException {
 
