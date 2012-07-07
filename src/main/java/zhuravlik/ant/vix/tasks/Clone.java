@@ -68,7 +68,7 @@ public class Clone extends VixAction {
         if (cloneType == null)
             cloneType = "linked";
         
-        if (!cloneType.equals("linked") || !cloneType.equals("full")) 
+        if (!cloneType.equals("linked") && !cloneType.equals("full"))
             throw new BuildException("Invalid clone type " + cloneType + ", should be either linked or full");
         
         int snapshotHandle = Vix.VIX_INVALID_HANDLE;

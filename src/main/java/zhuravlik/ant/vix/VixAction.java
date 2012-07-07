@@ -24,11 +24,13 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectComponent;
 
 /**
- * Created by IntelliJ IDEA.
- * User: anton
- * Date: 02.01.12
- * Time: 22:55
- * To change this template use File | Settings | File Templates.
+ * Abstract class for all subtasks of the head VixTask
+ *
+ * Each subtask implements executeAction method
+ * which represents the implementation of subtask logic
+ *
+ * VIX API actions in each subtasks may fail with log message
+ * or with BuildException depending on the value of ignoreError field
  */
 public abstract class VixAction extends ProjectComponent {
 
@@ -42,6 +44,13 @@ public abstract class VixAction extends ProjectComponent {
         this.ignoreError = ignoreError;
     }
 
+    /*
+     * Gets human-readable error message for specified VIX error code
+     *
+     * Either throws BuildException or logs warning depending on ignoreError field value
+     *
+     * @param err VIX error code
+     */
     public void checkError(int err) throws BuildException {
         if (Vix.VIX_OK != err) {
 
@@ -52,5 +61,11 @@ public abstract class VixAction extends ProjectComponent {
         }
     }
 
+    /*
+     * Abstract method describing subtask logic
+     * Should be implemented by all subtasks of VixTask
+     *
+     * @param vmHandle Virtual Machine handle to execute action on
+     */
     public abstract void executeAction(int vmHandle);
 }

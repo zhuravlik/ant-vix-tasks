@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="ant-vix-tasks-tests" default="fullTestSuite" xmlns:au="antlib:org.apache.ant.antunit">
+    <description>Tests for Ant taskset for VIX API</description>
+
+    
+    <!--<taskdef uri="antlib:org.apache.ant.antunit"
+                         resource="org/apache/ant/antunit/antlib.xml"
+                         classpath="${test.classpath}" />-->
+
+    <taskdef name="vix" classname="zhuravlik.ant.vix.VixTask" classpath="${test.classpath}" />
+
+    <target name="fullTestSuite">
+
+        <antcall target="testOpenVM" />
+        <antcall target="testSharedFolder" />
+        <antcall target="testPowerOperations" />
+     
+        <antcall target="testCloneLinkedDelete" />
+        <antcall target="testCloneFullDelete" />
+        <antcall target="testSnapshot" />
+     
+        <!--<echo message="${test.classpath}" />
+        <au:antunit failonerror="true">
+            <file file="${ant.file}" />
+            <au:plainlistener />
+            <au:xmllistener logLevel="info" toDir="${test.report.dir}" />
+            </au:antunit>-->
+    </target>
+
+    <target name="testOpenVM">
+        <vix path="${test.vm}" serviceprovider="${test.provider}">
+        </vix>
+    </target>
+
+    <target name="testSharedFolder">
+        <vix path="${test.vm}" serviceprovider="${test.provider}">
+            <addsharedfolder sharename="test_share" hostpath="/tmp" />
+            <setsharedfolderwriteable sharename="test_share" hostpath="/tmp"/>
+            <togglesharedfolders enable="true" /> 
+            <togglesharedfolders enable="false" /> 
+            <removesharedfolder sharename="test_share" />
+        </vix>
+    </target>
+
+    <target name="testPowerOperations">
+        <vix path="${test.vm}" serviceprovider="${test.provider}">
+            <poweron />
+            <pause />
+            <unpause />
+            <suspend />
+            <poweron />
+            <reset />
+            <poweroff />
+        </vix>
+    </target>
+
+    <target name="testCloneLinkedDelete">
+        <mkdir dir="/home/anton/vix-clone" />
+        <vix path="${test.vm}" serviceprovider="${test.provider}">
+            <clone clonetype="linked" destination="/home/anton/vix-clone/clone.vmx" />
+        </vix>
+        <vix path="/home/anton/vix-clone/clone.vmx" serviceprovider="${test.provider}">
+            <delete />
+        </vix>
+        <delete dir="/home/anton/vix-clone" />
+    </target>
+
+    <target name="testCloneFullDelete">
+        <mkdir dir="/home/anton/vix-clone" />
+        <vix path="${test.vm}" serviceprovider="${test.provider}">
+            <clone clonetype="full" destination="/home/anton/vix-clone/clone.vmx" />
+        </vix>
+        <vix path="/home/anton/vix-clone/clone.vmx" serviceprovider="${test.provider}">
+            <delete />
+        </vix>
+        <delete dir="/home/anton/vix-clone" />
+    </target>
+
+
+    <target name="testSnapshot">
+        <vix path="${test.vm}" serviceprovider="${test.provider}">
+            <takesnapshot name="vixtestsnap" description="My test snapshot" />
+            <poweron />
+            <reverttosnapshot name="vixtestsnap" />
+            <deletesnapshot name="vixtestsnap" />
+        </vix>
+    </target>
+
+    <target name="test"
+</project>

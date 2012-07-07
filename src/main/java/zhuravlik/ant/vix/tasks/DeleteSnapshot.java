@@ -67,14 +67,9 @@ public class DeleteSnapshot extends VixAction {
         int jobHandle = Vix.VIX_INVALID_HANDLE;
         IntByReference snapshotHandlePtr = new IntByReference();
 
-        jobHandle = LibraryHelper.getInstance().VixVM_GetNamedSnapshot(vmHandle,
+        int err = LibraryHelper.getInstance().VixVM_GetNamedSnapshot(vmHandle,
                 name,
                 snapshotHandlePtr);
-
-        int err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
-        LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
-        checkError(err);
-
 
         jobHandle = LibraryHelper.getInstance().VixVM_RemoveSnapshot(vmHandle,
                 snapshotHandlePtr.getValue(),

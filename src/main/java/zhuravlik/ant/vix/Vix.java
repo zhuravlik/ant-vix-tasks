@@ -25,11 +25,9 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 
 /**
- * Created by IntelliJ IDEA.
- * User: anton
- * Date: 02.01.12
- * Time: 22:56
- * To change this template use File | Settings | File Templates.
+ * JNA Library Interface for the VIX API
+ *
+ * Copy-paste from vix.h with JNA-specific fixes
  */
 public interface Vix extends Library{
 

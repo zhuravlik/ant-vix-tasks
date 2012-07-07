@@ -31,11 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by IntelliJ IDEA.
- * User: anton
- * Date: 02.01.12
- * Time: 22:49
- * To change this template use File | Settings | File Templates.
+ * Main VIX Ant task, representing abstraction over single Virtual Machine
+ * All operations with Virtual Machine are implemented as subtasks
  */
 public class VixTask extends Task {
 
@@ -278,14 +275,19 @@ public class VixTask extends Task {
         actions.add(vixAction);
     }
 
+    /*
+     * Implementation of Ant task execute method
+     */
     public void execute() throws BuildException {
 
+        // set init params for helper
         if (vixPath != null && vixPath.length() > 0) {
             LibraryHelper.path = vixPath;
         }
+        LibraryHelper.provider = serviceProvider == null ? "workstation" : serviceProvider;
 
+        // get VIX provider code for specified string
         int provider;
-        
         if (serviceProvider.equals("vi"))  {
             provider = Vix.VIX_SERVICEPROVIDER_VMWARE_VI_SERVER;
             log("VIX Service Provider is VI Server or VMWare Server 2.0", Project.MSG_INFO);
@@ -310,7 +312,8 @@ public class VixTask extends Task {
             log("Unknown service provider: " + serviceProvider + ", assuming workstation", Project.MSG_WARN);
             provider = Vix.VIX_SERVICEPROVIDER_VMWARE_WORKSTATION;
         }
-        
+
+        // if host is specified, it is remote session
         if (host != null) {
             log("Running remote session for host " + host + ":" + port, Project.MSG_INFO);
         }
@@ -339,7 +342,6 @@ public class VixTask extends Task {
 
         log("Opening VM [" + path + "]");
 
-
         jobHandle = LibraryHelper.getInstance().VixHost_OpenVM(hostHandlePtr.getValue(), path,
                 Vix.VIX_VMOPEN_NORMAL, Vix.VIX_INVALID_HANDLE, null, null);
         
@@ -352,6 +354,7 @@ public class VixTask extends Task {
 
         checkError(err);
 
+        // execute all subtasks
         for (VixAction vixAction: actions) {
             vixAction.executeAction(vmHandlePtr.getValue());
         }

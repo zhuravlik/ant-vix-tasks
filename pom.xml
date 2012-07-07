@@ -42,5 +42,38 @@
       <artifactId>commons-lang</artifactId>
       <version>2.3</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant-antunit</artifactId>
+      <scope>test</scope>
+      <version>1.2</version>
+    </dependency>
   </dependencies>
+
+  <build>
+    <plugins>  
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>test</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <ant antfile="${project.build.testOutputDirectory}/tests.xml"
+                  inheritAll="false" inheritRefs="false">
+                  <property name="xbuild.classpath" refid="maven.compile.classpath" />
+                  <property name="test.classpath" refid="maven.test.classpath" />
+                  <property name="test.vm" value="/home/anton/vmware/Windows XP Professional/Windows XP Professional.vmx" />
+                  <property name="test.provider" value="workstation" />
+                </ant>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>        
+      </plugin>
+    </plugins>
+  </build>
 </project>
