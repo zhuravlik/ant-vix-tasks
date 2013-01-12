@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project name="ant-vix-tasks-tests" default="fullTestSuite" xmlns:au="antlib:org.apache.ant.antunit">
+<project name="ant-vix-tasks-tests" default="fullTestSuite">
     <description>Tests for Ant taskset for VIX API</description>
 
     
@@ -86,5 +86,55 @@
         </vix>
     </target>
 
-    <target name="test"
+    <target name="testLoginLogout">
+        <vix path="${test.vm}" serviceprovider="${test.provider}">
+            <poweron />
+            <waitfortools />
+            <login interactive="false" user="admin" password="admin" />
+            <logout />
+            <login interactive="true" user="admin" password="admin" />
+            <logout />
+            <poweoff />
+        </vix>
+    </target>
+
+    <target name="testCreateMoveDeleteDirectory">
+        <vix path="${test.vm}" serviceprovider="${test.provider}">
+            <poweron />
+            <waitfortools />
+            <login interactive="true" user="admin" password="admin" />
+            <createdirectory path="c:\test" />
+            <movefile path="c:\test" destination="c:\test_moved" />
+            <deletedirectory path="c:\test_moved" />
+            <logout />
+            <poweoff />
+        </vix>
+    </target>
+
+    <target name="testCreateMoveDeleteFile">
+        <vix path="${test.vm}" serviceprovider="${test.provider}">
+            <poweron />
+            <waitfortools />
+            <login interactive="true" user="admin" password="admin" />
+            <createtempfile />
+            <movefile path="${vix.tempfile.path}" destination="c:\test_file_moved" />
+            <deletefile path="c:\test_file_moved" />
+            <logout />
+            <poweoff />
+        </vix>
+    </target>
+
+    <target name="testPutMoveGetFile">
+        <vix path="${test.vm}" serviceprovider="${test.provider}">
+            <poweron />
+            <waitfortools />
+            <login interactive="true" user="admin" password="admin" />
+            <putfile path="/home/anton/.bashrc" destination="c:\bashrc" />
+            <movefile path="c:\bashrc" destination="c:\bashrc2" />
+            <getfile path="c:\bashrc2" destination="/tmp/bashrc2" />
+            <logout />
+            <poweoff />
+        </vix>
+    </target>
+
 </project>

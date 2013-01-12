@@ -120,8 +120,15 @@ public class LibraryHelper {
             String[] list = dir.list();
             for (String fl: list)
             {
-                if (fl.contains("Workstation-") || fl.contains("Server-")
-                        || fl.contains("Player-") || fl.contains("VIServer-"))
+                //if (fl.contains("Workstation-") || fl.contains("Server-")
+                //        || fl.contains("Player-") || fl.contains("VIServer-"))
+
+                if (
+                        provider.equals("vi") && fl.contains("VIServer-") ||
+                        provider.contains("workstation") && fl.contains("Workstation-") ||
+                        provider.equals("player") && fl.contains("Player-") ||
+                        provider.equals("server") && fl.contains("Server-")
+                   )
                 {
                     File wdir = new File(gpath + fl);
                     String[] wlist = wdir.list();

@@ -44,6 +44,16 @@ public abstract class VixAction extends ProjectComponent {
         this.ignoreError = ignoreError;
     }
 
+    boolean logError = false;
+
+    public boolean isLogError() {
+        return logError;
+    }
+
+    public void setLogError(boolean logError) {
+        this.logError = logError;
+    }
+
     /*
      * Gets human-readable error message for specified VIX error code
      *
@@ -57,7 +67,7 @@ public abstract class VixAction extends ProjectComponent {
             if (!ignoreError)
                 throw new BuildException("VMWare error: " + LibraryHelper.getInstance().Vix_GetErrorText(err, null));
             else
-                log("VMWare error: " + LibraryHelper.getInstance().Vix_GetErrorText(err, null), Project.MSG_ERR);
+                log("VMWare error: " + LibraryHelper.getInstance().Vix_GetErrorText(err, null), logError ? Project.MSG_ERR : Project.MSG_WARN);
         }
     }
 

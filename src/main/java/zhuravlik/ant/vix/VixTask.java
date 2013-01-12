@@ -40,6 +40,16 @@ public class VixTask extends Task {
 
     boolean ignoreError = false;
 
+    boolean logError = false;
+
+    public boolean isLogError() {
+        return logError;
+    }
+
+    public void setLogError(boolean logError) {
+        this.logError = logError;
+    }
+
     public boolean isIgnoreError() {
         return ignoreError;
     }
@@ -54,7 +64,7 @@ public class VixTask extends Task {
             if (!ignoreError)
                 throw new BuildException("VMWare error: " + LibraryHelper.getInstance().Vix_GetErrorText(err, null));
             else
-                log("VMWare error: " + LibraryHelper.getInstance().Vix_GetErrorText(err, null), Project.MSG_ERR);
+                log("VMWare error: " + LibraryHelper.getInstance().Vix_GetErrorText(err, null), logError ? Project.MSG_ERR : Project.MSG_WARN);
         }
     }
 
@@ -126,6 +136,16 @@ public class VixTask extends Task {
     }
 
     private String vixPath;
+
+    private String operation = "OpenAndRun";
+
+    public String getOperation() {
+        return operation;
+    }
+
+    public void setOperation(String op) {
+        operation = op;
+    }
 
     public void addCaptureScreen(CaptureScreen captureScreen) {
         actions.add(captureScreen);
@@ -340,23 +360,49 @@ public class VixTask extends Task {
         LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
         checkError(err);
 
-        log("Opening VM [" + path + "]");
+        if (operation.equals("OpenAndRun"))  {
+            log("Opening VM [" + path + "]");
 
-        jobHandle = LibraryHelper.getInstance().VixHost_OpenVM(hostHandlePtr.getValue(), path,
-                Vix.VIX_VMOPEN_NORMAL, Vix.VIX_INVALID_HANDLE, null, null);
-        
-        IntByReference vmHandlePtr = new IntByReference();
-        
-        err = LibraryHelper.getInstance().VixJob_Wait(jobHandle,
-                Vix.VIX_PROPERTY_JOB_RESULT_HANDLE,
-                vmHandlePtr,
-                Vix.VIX_PROPERTY_NONE);
+            jobHandle = LibraryHelper.getInstance().VixHost_OpenVM(hostHandlePtr.getValue(), path,
+                    Vix.VIX_VMOPEN_NORMAL, Vix.VIX_INVALID_HANDLE, null, null);
 
-        checkError(err);
+            IntByReference vmHandlePtr = new IntByReference();
 
-        // execute all subtasks
-        for (VixAction vixAction: actions) {
-            vixAction.executeAction(vmHandlePtr.getValue());
+            err = LibraryHelper.getInstance().VixJob_Wait(jobHandle,
+                    Vix.VIX_PROPERTY_JOB_RESULT_HANDLE,
+                    vmHandlePtr,
+                    Vix.VIX_PROPERTY_NONE);
+
+            LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
+
+            checkError(err);
+
+            // execute all subtasks
+            for (VixAction vixAction: actions) {
+                vixAction.executeAction(vmHandlePtr.getValue());
+            }
+        }
+        else if (operation.equals("Register")) {
+            log("Registering VM [" + path + "]");
+
+            jobHandle = LibraryHelper.getInstance().VixHost_RegisterVM(hostHandlePtr.getValue(), path, null, null);
+
+            err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
+
+            LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
+
+            checkError(err);
+        }
+        else if (operation.equals("Unregister")) {
+            log("Unregistering VM [" + path + "]");
+
+            jobHandle = LibraryHelper.getInstance().VixHost_UnregisterVM(hostHandlePtr.getValue(), path, null, null);
+
+            err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
+
+            LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
+
+            checkError(err);
         }
         
         LibraryHelper.getInstance().VixHost_Disconnect(hostHandlePtr.getValue());
