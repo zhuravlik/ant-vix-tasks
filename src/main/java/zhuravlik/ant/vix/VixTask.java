@@ -442,24 +442,34 @@ public class VixTask extends Task {
         else if (operation.equals("Foreach") && callbackTargetName != null) {
             log("Executing callback task " + callbackTargetName + " for all " + findType + " machines");
 
-            Callback callback = new Callback(Vix.VIX_EVENTTYPE_FIND_ITEM, callbackTargetName,
+            foundVMs.clear();
+
+            Callback callback = new Callback(Vix.VIX_EVENTTYPE_FIND_ITEM, null,
                     getProject(), new VixDiscoverySetPropertiesProc());
 
             jobHandle = LibraryHelper.getInstance().VixHost_FindItems(hostHandlePtr.getValue(),
                     findType.equals("running") ? Vix.VIX_FIND_RUNNING_VMS :
                         Vix.VIX_FIND_REGISTERED_VMS, Vix.VIX_INVALID_HANDLE, -1,
-                    callbackTargetName != null ? callback : null, null);
+                    callback, null);
 
             err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
 
             LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
 
             checkError(err);
+
+            for (String vm : foundVMs) {
+                getProject().setProperty("vix.found.vm", vm);
+                if (callbackTargetName != null)
+                    getProject().executeTarget(callbackTargetName);
+            }
         }
         
         LibraryHelper.getInstance().VixHost_Disconnect(hostHandlePtr.getValue());
         LibraryHelper.getInstance().Vix_ReleaseHandle(hostHandlePtr.getValue());
     }
+
+    private List<String> foundVMs = new ArrayList<String>();
 
     private class VixDiscoverySetPropertiesProc implements Callback.SetPropertiesProc {
 
@@ -470,7 +480,7 @@ public class VixTask extends Task {
                     url, Vix.VIX_PROPERTY_NONE);
             checkError(err);
 
-            getProject().setProperty("vix.found.vm", url.getValue().getString(0));
+            foundVMs.add(url.getValue().getString(0));
         }
     }
 

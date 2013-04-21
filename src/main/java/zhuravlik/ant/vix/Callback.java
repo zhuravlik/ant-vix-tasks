@@ -54,11 +54,13 @@ public class Callback implements VixEventProcCallback {
 
     @Override
     public void VixEventProc(int handle, int eventType, int moreEventInfo, Pointer clientData) {
-        if (eventType != this.eventType || targetName == null)
+        if (eventType != this.eventType)
             return;
 
         if (proc != null)
             proc.setProperties(handle, eventType, moreEventInfo, clientData);
-        project.executeTarget(targetName);
+
+        if (targetName != null)
+            project.executeTarget(targetName);
     }
 }
