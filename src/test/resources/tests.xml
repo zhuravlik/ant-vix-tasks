@@ -11,13 +11,15 @@
 
     <target name="fullTestSuite">
 
-        <antcall target="testOpenVM" />
+        <!--<antcall target="testOpenVM" />
         <antcall target="testSharedFolder" />
         <antcall target="testPowerOperations" />
      
         <antcall target="testCloneLinkedDelete" />
         <antcall target="testCloneFullDelete" />
-        <antcall target="testSnapshot" />
+        <antcall target="testSnapshot" />-->
+        
+        <antcall target="testCallback" />
      
         <!--<echo message="${test.classpath}" />
         <au:antunit failonerror="true">
@@ -135,6 +137,15 @@
             <logout />
             <poweoff />
         </vix>
+    </target>
+
+    <target name="testCallback">
+        <vix serviceprovider="${test.provider}" operation="Foreach" findtype="running" callbacktargetname="aaa">            
+        </vix>
+    </target>
+
+    <target name="aaa">
+        <echo message="${vix.found.vm}" />
     </target>
 
 </project>

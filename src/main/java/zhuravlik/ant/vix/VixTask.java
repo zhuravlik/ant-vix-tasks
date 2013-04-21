@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2012 Anton Lobov <zhuravlik> <ahmad200512[at]yandex.ru>
+   Copyright (C) 2012-2013 Anton Lobov <zhuravlik> <ahmad200512[at]yandex.ru>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -19,14 +19,14 @@
 
 package zhuravlik.ant.vix;
 
+import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
-import org.apache.commons.lang.SystemUtils;
+import com.sun.jna.ptr.PointerByReference;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import zhuravlik.ant.vix.tasks.*;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -139,12 +139,35 @@ public class VixTask extends Task {
 
     private String operation = "OpenAndRun";
 
+    private String callbackTargetName = null;
+
+    private String findType = "registered";
+
     public String getOperation() {
         return operation;
     }
 
     public void setOperation(String op) {
         operation = op;
+    }
+
+    public String getCallbackTargetName() {
+        return callbackTargetName;
+    }
+
+    public void setCallbackTargetName(String callbackTargetName) {
+        this.callbackTargetName = callbackTargetName;
+    }
+
+    public String getFindType() {
+        return findType;
+    }
+
+    public void setFindType(String findType) {
+        //if (findType != "running" && findType != "registered")
+        //    throw new BuildException("Invalid VM find type: " + findType);
+
+        this.findType = findType;
     }
 
     public void addCaptureScreen(CaptureScreen captureScreen) {
@@ -363,8 +386,12 @@ public class VixTask extends Task {
         if (operation.equals("OpenAndRun"))  {
             log("Opening VM [" + path + "]");
 
+            Callback callback = new Callback(Vix.VIX_EVENTTYPE_JOB_COMPLETED, callbackTargetName,
+                    getProject());
+
             jobHandle = LibraryHelper.getInstance().VixHost_OpenVM(hostHandlePtr.getValue(), path,
-                    Vix.VIX_VMOPEN_NORMAL, Vix.VIX_INVALID_HANDLE, null, null);
+                    Vix.VIX_VMOPEN_NORMAL, Vix.VIX_INVALID_HANDLE,
+                    callbackTargetName != null ? callback : null, null);
 
             IntByReference vmHandlePtr = new IntByReference();
 
@@ -385,7 +412,11 @@ public class VixTask extends Task {
         else if (operation.equals("Register")) {
             log("Registering VM [" + path + "]");
 
-            jobHandle = LibraryHelper.getInstance().VixHost_RegisterVM(hostHandlePtr.getValue(), path, null, null);
+            Callback callback = new Callback(Vix.VIX_EVENTTYPE_JOB_COMPLETED, callbackTargetName,
+                    getProject());
+
+            jobHandle = LibraryHelper.getInstance().VixHost_RegisterVM(hostHandlePtr.getValue(), path,
+                    callbackTargetName != null ? callback : null, null);
 
             err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
 
@@ -396,7 +427,28 @@ public class VixTask extends Task {
         else if (operation.equals("Unregister")) {
             log("Unregistering VM [" + path + "]");
 
-            jobHandle = LibraryHelper.getInstance().VixHost_UnregisterVM(hostHandlePtr.getValue(), path, null, null);
+            Callback callback = new Callback(Vix.VIX_EVENTTYPE_JOB_COMPLETED, callbackTargetName,
+                    getProject());
+
+            jobHandle = LibraryHelper.getInstance().VixHost_UnregisterVM(hostHandlePtr.getValue(), path,
+                    callbackTargetName != null ? callback : null, null);
+
+            err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
+
+            LibraryHelper.getInstance().Vix_ReleaseHandle(jobHandle);
+
+            checkError(err);
+        }
+        else if (operation.equals("Foreach") && callbackTargetName != null) {
+            log("Executing callback task " + callbackTargetName + " for all " + findType + " machines");
+
+            Callback callback = new Callback(Vix.VIX_EVENTTYPE_FIND_ITEM, callbackTargetName,
+                    getProject(), new VixDiscoverySetPropertiesProc());
+
+            jobHandle = LibraryHelper.getInstance().VixHost_FindItems(hostHandlePtr.getValue(),
+                    findType.equals("running") ? Vix.VIX_FIND_RUNNING_VMS :
+                        Vix.VIX_FIND_REGISTERED_VMS, Vix.VIX_INVALID_HANDLE, -1,
+                    callbackTargetName != null ? callback : null, null);
 
             err = LibraryHelper.getInstance().VixJob_Wait(jobHandle, Vix.VIX_PROPERTY_NONE);
 
@@ -408,4 +460,19 @@ public class VixTask extends Task {
         LibraryHelper.getInstance().VixHost_Disconnect(hostHandlePtr.getValue());
         LibraryHelper.getInstance().Vix_ReleaseHandle(hostHandlePtr.getValue());
     }
+
+    private class VixDiscoverySetPropertiesProc implements Callback.SetPropertiesProc {
+
+        @Override
+        public void setProperties(int handle, int eventType, int moreEventInfo, Pointer clientData) {
+            PointerByReference url = new PointerByReference();
+            int err = LibraryHelper.getInstance().Vix_GetProperties(moreEventInfo, Vix.VIX_PROPERTY_FOUND_ITEM_LOCATION,
+                    url, Vix.VIX_PROPERTY_NONE);
+            checkError(err);
+
+            getProject().setProperty("vix.found.vm", url.getValue().getString(0));
+        }
+    }
+
+
 }

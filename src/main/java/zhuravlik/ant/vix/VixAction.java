@@ -1,5 +1,5 @@
 /*
-   Copyright (C) 2012 Anton Lobov <zhuravlik> <ahmad200512[at]yandex.ru>
+   Copyright (C) 2012-2013 Anton Lobov <zhuravlik> <ahmad200512[at]yandex.ru>
 
    This library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public
@@ -19,6 +19,7 @@
 
 package zhuravlik.ant.vix;
 
+import com.sun.jna.Pointer;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectComponent;
